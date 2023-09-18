@@ -29,11 +29,12 @@ def process_folders(path_list):
     print(folder)
    
     
-    timestamp = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
-    csv_file_name = f'folder_sizes_of_{folder}_{timestamp}.csv'
+    #timestamp = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+    #csv_file_name = f'folder_sizes_of_{folder}_{timestamp}.csv'
+    csv_file_name = f'folder_sizes_of_{folder}.csv'
 
     # Write the results to the CSV file
-    with open(csv_file_name, mode='w', newline='') as csv_file:
+    with open(csv_file_name, mode='w+', newline='') as csv_file:
         fieldnames = ['Folder', 'Size (MB)', 'Size (GB)']
         writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
         
@@ -41,10 +42,11 @@ def process_folders(path_list):
         for result in sorted(results, key=lambda x: x[1], reverse=True):
             writer.writerow({'Folder': result[0], 'Size (MB)': result[1], 'Size (GB)': result[2]})
 
-ip = input("Path: ").lstrip()
-p = Path(ip)
+while True:
+    ip = input("Path: ").lstrip()
+    p = Path(ip)
 
-# All subdirectories in the current directory, not recursive.
-path_list = [f for f in p.iterdir() if f.is_dir()]
+    # All subdirectories in the current directory, not recursive.
+    path_list = [f for f in p.iterdir() if f.is_dir()]
 
-process_folders(path_list)
+    process_folders(path_list)
