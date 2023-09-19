@@ -3,6 +3,14 @@ import concurrent.futures
 from pathlib import Path
 import csv
 from datetime import datetime
+import logging
+
+# Configure the logging module
+logging.basicConfig(
+    filename='exception.log',  # Specify the name of the log file
+    level=logging.ERROR,      # Set the logging level to capture only ERROR and higher-level messages
+    format='%(asctime)s - %(levelname)s - %(message)s'  # Define the log message format
+)
 
 def get_size(start_path='.'):
     total_size = 0
@@ -10,8 +18,12 @@ def get_size(start_path='.'):
         for f in filenames:
             fp = os.path.join(dirpath, f)
             # skip if it is symbolic link
-            if not os.path.islink(fp):
-                total_size += os.path.getsize(fp)
+            try:
+                if not os.path.islink(fp):
+                    total_size += os.path.getsize(fp)
+            except Exception as e:
+                logging.error(f"{e}")
+                
     bytess = total_size
     resMB, resGB = bytess // 1000 // 1000, bytess // 1000 // 1000 / 1000
     print(f"{start_path}\t ==>\t \t{resMB} MB, {resGB} GB")
