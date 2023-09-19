@@ -1,0 +1,1 @@
+ pyinstaller  --add-data "theme;dist/theme"  --add-data "azure.tcl;dist/azure.tcl" --noconsole --onefile --hidden-import="*" .\Main.py --name="FolderSize" 
