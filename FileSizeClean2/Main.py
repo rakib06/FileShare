@@ -12,6 +12,13 @@ from tkinter import ttk
 from csv_read import get_data, get_data_with_SL, get_data_with_GridFormat
 import os
 from tkinter import messagebox
+from functools import lru_cache
+from dotenv import load_dotenv
+load_dotenv(r'.env')
+
+
+MAX_ITEM_SHOW = int(os.getenv('MAX_ITEM_SHOW'))
+# print(MAX_ITEM_SHOW)
 
 class App(ttk.Frame):
     def __init__(self, parent):
@@ -47,6 +54,10 @@ class App(ttk.Frame):
         self.check_frame.grid(
             row=0, column=0, padx=(20, 10), pady=(20, 10), sticky="nsew"
         )
+        
+        def copy_to_clipboard(text):
+            self.clipboard_clear()  # Clear the clipboard
+            self.clipboard_append(text)  # Append the text to the clipboard
 
         def askDir():
             global istreeSetup, CURRENT_FOLDER
@@ -55,8 +66,10 @@ class App(ttk.Frame):
             startprocess_csv(folder_path)
             CURRENT_FOLDER = folder_path    
         
+       
         def startprocess_csv(folder_path):
-            
+            global CURRENT_FOLDER
+            CURRENT_FOLDER = folder_path
             csv_file = process(folder_path)
             data = get_data_with_GridFormat(csv_file_name=csv_file)
             if not istreeSetup:
@@ -124,7 +137,8 @@ class App(ttk.Frame):
                 self.treeview.delete(i)
             
             # Insert treeview data
-            for item in treeview_data[1:]:
+            treeview_data = treeview_data[1:MAX_ITEM_SHOW+1]
+            for item in treeview_data:
                 self.treeview.insert(
                 parent=item[0], index="end", iid=item[1], text=item[2], values=item[3]
                 )
@@ -136,12 +150,14 @@ class App(ttk.Frame):
             self.treeview.selection_set(10 if len(treeview_data)> 10 else len(treeview_data[1:]))
             self.treeview.see(7 if len(treeview_data)> 7 else len(treeview_data[1:]))
             def on_item_click(event):
+                
                 item = self.treeview.selection()[0]
                 dir_ = self.treeview.item(item)['text']
+                copy_to_clipboard(dir_)
                 # name, value = self.treeview.item(item, 'text')
                 # print(f"Clicked on {name}: {value}")
                 print(dir_)
-                result = messagebox.askyesno("Confirmation", f"Are you sure you want to start the process for {dir_}?")
+                result = messagebox.askyesno("Confirmation", f"Copy to clipboard press [no] / Process [yes] {dir_}?")
                 if result: startprocess_csv(dir_)
 
             # Bind the click event to the Treeview
