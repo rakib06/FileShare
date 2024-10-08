@@ -18,11 +18,15 @@ def get_file_hash(file_path, hash_algo=hashlib.md5):
     return hash_obj.hexdigest()
 
 # Function to find unique files (distinct files based on hash)
-def find_unique_files(directory):
+def find_unique_files(directory, exclude_directory):
     hashes = defaultdict(list)  # Dictionary to store file hashes and their paths
 
-    # Traverse the directory
+    # Traverse the directory, excluding the destination directory
     for root, _, files in os.walk(directory):
+        # Skip the exclude_directory (destination) during the scan
+        if exclude_directory and os.path.commonpath([root, exclude_directory]) == exclude_directory:
+            continue
+        
         for file_name in files:
             # Only process files with the specified extensions
             if file_name.lower().endswith(FILE_TYPES):
@@ -54,8 +58,8 @@ if __name__ == "__main__":
     # Destination directory for unique files
     destination_directory = input("Enter the directory to copy distinct files to: ")
 
-    # Find unique files
-    unique_files = find_unique_files(directory_to_scan)
+    # Find unique files, excluding the destination directory
+    unique_files = find_unique_files(directory_to_scan, destination_directory)
 
     if unique_files:
         print("Copying unique files to the destination directory...")
