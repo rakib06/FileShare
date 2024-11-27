@@ -7,6 +7,39 @@ def start_round(request, round_id):
 
     # Set start time in session when round starts
     if 'start_round' in request.POST:
+        request.session['round_start_time'] = datetime.now().strftime('%Y-%m-%dT%H:%M:%S')  # Save as ISO format string
+
+    # Check if time is up
+    if 'finish' in request.POST:
+        start_time_str = request.session.get('round_start_time')
+        if start_time_str:
+            # Parse the stored time string into a datetime object
+            start_time = datetime.strptime(start_time_str, '%Y-%m-%dT%H:%M:%S')
+            time_elapsed = (datetime.now() - start_time).total_seconds()
+
+            if time_elapsed > timer_duration:
+                message = "Time's Up! You can't finish now."
+                return render(request, 'quiz/start_round.html', {
+                    'round': round_obj,
+                    'message': message,
+                })
+
+    # Existing logic...
+    return render(request, 'quiz/start_round.html', {
+        'round': round_obj,
+        'timer_duration': timer_duration,
+        # other context data
+    })
+
+
+from datetime import datetime, timedelta
+
+def start_round(request, round_id):
+    round_obj = Round.objects.get(id=round_id)
+    timer_duration = round_obj.timer_duration  # Timer duration in seconds
+
+    # Set start time in session when round starts
+    if 'start_round' in request.POST:
         request.session['round_start_time'] = datetime.now().isoformat()
 
     # Check if time is up
