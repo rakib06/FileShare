@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Floor Quiz</title>
+</head>
+<body>
+    <h1>Floor Quiz</h1>
+    <h2>Teams:</h2>
+    <ul>
+        {% for team in teams %}
+        <li>{{ team.name }} - Score: {{ team.score }}</li>
+        {% endfor %}
+    </ul>
+    <h2>Select Round:</h2>
+    <ul>
+        {% for round in round_list %}
+        <li><a href="{% url 'start_quiz' round.id %}">{{ round.name }}</a></li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Quiz Round</title>
+</head>
+<body>
+    <h1>Round: {{ round.name }}</h1>
+    <h2>Question:</h2>
+    <p>{{ question.question_text }}</p>
+    {% if question.image %}
+    <img src="{{ question.image.url }}" alt="Question Image">
+    {% endif %}
+    <form method="POST">
+        {% csrf_token %}
+        <label for="team">Select Team:</label>
+        <select name="team">
+            {% for team in teams %}
+            <option value="{{ team.id }}">{{ team.name }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit">Submit Answer</button>
+    </form>
+</body>
+</html>
+
+
+
