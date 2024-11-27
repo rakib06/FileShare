@@ -1,4 +1,29 @@
 
+from datetime import datetime, timedelta
+
+def start_round(request, round_id):
+    round_obj = Round.objects.get(id=round_id)
+    timer_duration = round_obj.timer_duration  # Timer duration in seconds
+
+    # Set start time in session when round starts
+    if 'start_round' in request.POST:
+        request.session['round_start_time'] = datetime.now().isoformat()
+
+    # Check if time is up
+    if 'finish' in request.POST:
+        start_time = datetime.fromisoformat(request.session.get('round_start_time'))
+        time_elapsed = (datetime.now() - start_time).total_seconds()
+
+        if time_elapsed > timer_duration:
+            message = "Time's Up! You can't finish now."
+            return render(request, 'quiz/start_round.html', {
+                'round': round_obj,
+                'message': message,
+            })
+
+    # Existing logic...
+
+
 from django.shortcuts import render, redirect
 from .models import Team, Question, Round
 import random
