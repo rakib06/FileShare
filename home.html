@@ -1,6 +1,66 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <title>Floor Quiz - Home</title>
+</head>
+<body>
+    <h1>Floor Quiz</h1>
+    <h2>Rounds:</h2>
+    <ul>
+        {% for round in rounds %}
+        <li>
+            {{ round.name }}
+            <a href="{% url 'start_round' round.id %}">Start</a>
+        </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ round.name }}</title>
+</head>
+<body>
+    <h1>Round: {{ round.name }}</h1>
+
+    {% if selected_team %}
+    <h2>Selected Team: {{ selected_team }}</h2>
+    {% else %}
+    <form method="POST">
+        {% csrf_token %}
+        <button type="submit" name="start_round">Select a Random Team</button>
+    </form>
+    {% endif %}
+
+    {% if selected_team %}
+        {% if question %}
+        <h2>Question:</h2>
+        <p>{{ question.question_text }}</p>
+        {% if question.image %}
+        <img src="{{ question.image.url }}" alt="Question Image">
+        {% endif %}
+        {% else %}
+        <form method="POST">
+            {% csrf_token %}
+            <button type="submit" name="get_question">Get a Random Question</button>
+        </form>
+        {% endif %}
+    {% endif %}
+</body>
+</html>
+
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html>
+<head>
     <title>Floor Quiz</title>
 </head>
 <body>
