@@ -1,3 +1,57 @@
+
+{% extends "admin/base_site.html" %}
+{% block content %}
+<div class="container">
+    <h1>Floor Quiz</h1>
+    <h2>Rounds:</h2>
+    <ul class="object-tools">
+        {% for round in rounds %}
+        <li>
+            <a class="btn btn-primary" href="{% url 'start_round' round.id %}">
+                Start {{ round.name }}
+            </a>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}
+
+{% extends "admin/base_site.html" %}
+{% block content %}
+<div class="container">
+    <h1>Round: {{ round.name }}</h1>
+
+    {% if selected_team %}
+    <h2>Selected Team: {{ selected_team }}</h2>
+    {% else %}
+    <form method="POST" class="form-inline">
+        {% csrf_token %}
+        <button class="btn btn-success" type="submit" name="start_round">Select a Random Team</button>
+    </form>
+    {% endif %}
+
+    {% if selected_team %}
+        {% if question %}
+        <h2>Question:</h2>
+        <p>{{ question.question_text }}</p>
+        {% if question.image %}
+        <img src="{{ question.image.url }}" alt="Question Image" class="img-fluid">
+        {% endif %}
+        {% else %}
+        <form method="POST">
+            {% csrf_token %}
+            <button class="btn btn-info" type="submit" name="get_question">Get a Random Question</button>
+        </form>
+        {% endif %}
+    {% endif %}
+</div>
+{% endblock %}
+
+
+
+
+
+
 <!DOCTYPE html>
 <html>
 <head>
