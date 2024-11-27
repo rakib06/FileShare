@@ -1,3 +1,71 @@
+{% extends "admin/base_site.html" %}
+{% block content %}
+<div class="container">
+    <h1>Round: {{ round.name }}</h1>
+    
+    {% if selected_team %}
+        <h2>Current Team: {{ selected_team }}</h2>
+        {% if question %}
+        <h3>Question:</h3>
+        <p>{{ question.question_text }}</p>
+        {% if question.image %}
+        <img src="{{ question.image.url }}" alt="Question Image" class="img-fluid">
+        {% endif %}
+        <div id="timer" style="font-size: 24px; color: red;"></div> <!-- Timer Display -->
+        <form method="POST">
+            {% csrf_token %}
+            <button class="btn btn-success" type="submit" name="finish">Finish</button>
+        </form>
+        {% else %}
+        <form method="POST">
+            {% csrf_token %}
+            <button class="btn btn-info" type="submit" name="get_question">Get a Random Question</button>
+        </form>
+        {% endif %}
+    {% else %}
+        <form method="POST">
+            {% csrf_token %}
+            <button class="btn btn-success" type="submit" name="start_round">Select a Random Team</button>
+        </form>
+    {% endif %}
+</div>
+
+<script>
+    // Timer setup
+    let timerDuration = {{ timer_duration }}; // Duration from backend in seconds
+    let timerDisplay = document.getElementById('timer');
+
+    function startTimer() {
+        let countdown = setInterval(function () {
+            let minutes = Math.floor(timerDuration / 60);
+            let seconds = timerDuration % 60;
+
+            // Format time
+            seconds = seconds < 10 ? '0' + seconds : seconds;
+            minutes = minutes < 10 ? '0' + minutes : minutes;
+
+            // Update timer display
+            timerDisplay.innerHTML = `Time Remaining: ${minutes}:${seconds}`;
+
+            if (timerDuration <= 0) {
+                clearInterval(countdown); // Stop timer
+                timerDisplay.innerHTML = "Time's Up!"; // Display Time's Up message
+
+                // Optionally, disable inputs
+                document.querySelector('button[name="finish"]').disabled = true;
+                document.querySelector('button[name="get_question"]').disabled = true;
+            }
+
+            timerDuration -= 1;
+        }, 1000); // Update every second
+    }
+
+    // Start the timer when the page loads
+    window.onload = startTimer;
+</script>
+{% endblock %}
+
+
 
 {% extends "admin/base_site.html" %}
 {% block content %}
