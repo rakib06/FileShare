@@ -211,4 +211,31 @@ Next Steps
 	3.	Leaderboard: Create a page to display team scores dynamically.
 	4.	Deployment: Use Heroku or Django’s deployment tools to host the app.
 
+
+from django.db import models
+
+class Team(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+    score = models.IntegerField(default=0)
+
+    def __str__(self):
+        return self.name
+
+class Round(models.Model):
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
+
+class Question(models.Model):
+    round = models.ForeignKey(Round, on_delete=models.CASCADE)
+    question_text = models.TextField()
+    image = models.ImageField(upload_to='question_images/', blank=True, null=True)
+    answer = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.question_text
+
+
+
 Let me know if you’d like any specific feature or enhancement!
