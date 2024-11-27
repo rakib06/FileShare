@@ -23,3 +23,24 @@ def start_quiz(request, round_id):
         'teams': Team.objects.all(),
         'round': round_obj,
     })
+    
+    
+    
+from django.urls import path
+from . import views
+
+urlpatterns = [
+    path('', views.home, name='home'),
+    path('start-quiz/<int:round_id>/', views.start_quiz, name='start_quiz'),
+]
+
+from django.contrib import admin
+from django.urls import path, include
+from django.conf import settings
+from django.conf.urls.static import static
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('', include('quiz.urls')),
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
