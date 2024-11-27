@@ -3,44 +3,37 @@ from .models import Team, Question, Round
 import random
 
 def home(request):
+    rounds = Round.objects.all()
     teams = Team.objects.all()
-    return render(request, 'quiz/home.html', {'teams': teams})
+    return render(request, 'quiz/home.html', {'rounds': rounds, 'teams': teams})
 
-def start_quiz(request, round_id):
+
+def start_round(request, round_id):
     round_obj = Round.objects.get(id=round_id)
-    questions = Question.objects.filter(round=round_obj)
-    random_question = random.choice(questions)
+    teams = Team.objects.all()
+    selected_team = None
+    question = None
 
-    if request.method == 'POST':
-        team_id = request.POST['team']
-        team = Team.objects.get(id=team_id)
-        team.score += 1  # Update score for correct answer
-        team.save()
-        return redirect('home')
+    # Handle random team selection
+    if 'start_round' in request.POST:
+        selected_team = random.choice(teams)
+        request.session['selected_team'] = selected_team.name  # Save to session for persistence
 
-    return render(request, 'quiz/quiz.html', {
-        'question': random_question,
-        'teams': Team.objects.all(),
+    # Handle random question selection
+    if 'get_question' in request.POST:
+        questions = Question.objects.filter(round=round_obj)
+        question = random.choice(questions)
+        request.session['current_question'] = question.id  # Save question for display
+
+    # Retrieve session data if available
+    selected_team = request.session.get('selected_team', selected_team)
+    question_id = request.session.get('current_question')
+    if question_id:
+        question = Question.objects.get(id=question_id)
+
+    return render(request, 'quiz/start_round.html', {
         'round': round_obj,
+        'teams': teams,
+        'selected_team': selected_team,
+        'question': question,
     })
-    
-    
-    
-from django.urls import path
-from . import views
-
-urlpatterns = [
-    path('', views.home, name='home'),
-    path('start-quiz/<int:round_id>/', views.start_quiz, name='start_quiz'),
-]
-
-from django.contrib import admin
-from django.urls import path, include
-from django.conf import settings
-from django.conf.urls.static import static
-
-urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('', include('quiz.urls')),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-
